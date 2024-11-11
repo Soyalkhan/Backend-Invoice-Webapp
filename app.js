@@ -1,0 +1,30 @@
+const express = require('express');
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env' }); 
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const session = require('express-session');
+const connectDB = require('./config/db');
+
+
+const app = express();
+
+// Connect to the database
+connectDB();
+
+// Enable CORS for all routes
+app.use(cors());
+
+
+app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
+
+// Mount routers
+app.use('/api/auth', require('./Routes/authRoutes')); //auth resgiter
+app.use('/api/customers', require('./Routes/customerRoutes'));// customers routes
+app.use('/api/products' , require('./Routes/productRoutes'));// products routes
+
+
+module.exports = app;
