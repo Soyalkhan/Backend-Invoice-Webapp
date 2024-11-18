@@ -68,3 +68,23 @@ exports.deleteProduct = async (req, res) => {
         res.status(400).json({ success: false, error: error.message });
     }
 };
+
+
+
+// Get all products for a specific user
+exports.getProducts = async (req, res) => {
+    const userId = req.user._id; // Get the userId from the authenticated request
+
+    try {
+        const products = await Product.find({ userId: userId }); // Find products for this user
+        res.status(200).json({
+            success: true,
+            products
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+};

@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    phone: {
+        type: String,
+        default: ''
+    },
     profileImage: {
         type: String,
         default: '' // URL of the profile image

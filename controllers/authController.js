@@ -14,9 +14,9 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.registerUser = async (req, res) => {
-    const { email, phone, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword } = req.body;
 
-    const existingUser = await User.findOne({ $or: [{ email: email }, { phone: phone }] });
+    const existingUser = await User.findOne({ $or: [{ email: email }] });
     if (existingUser) {
         return res.status(400).json({ success: false, message: 'User already exists' });
     }
@@ -31,7 +31,6 @@ exports.registerUser = async (req, res) => {
         // Create a new user instance
         const newUser = await User.create({
             email,
-            phone,
             password,
             isVerified: false, // Initially set to false
             verificationToken: verificationToken // Store the token for later verification

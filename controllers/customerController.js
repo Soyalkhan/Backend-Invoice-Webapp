@@ -26,3 +26,22 @@ exports.createCustomer = async (req, res) => {
         res.status(400).json({ success: false, error: error.message });
     }
 };
+
+
+// Get all customer for a specific user
+exports.fetchAllcusomer = async (req, res) => {
+    const userId = req.user._id; // Get the userId from the authenticated request
+
+    try {
+        const customer = await Customer.find({ userId: userId }); // Find products for this user
+        res.status(200).json({
+            success: true,
+            customer
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
