@@ -131,7 +131,7 @@ exports.login = async (req, res) => {
 //update users profile with all deatils
 
 exports.updateProfile = async (req, res) => {
-    const { first_name, last_name, companyName, GST, profileImage, companyFullAddress, country, city, pincode } = req.body;
+    const { first_name, last_name, companyName, GST, profileImage, companyFullAddress, country, city, pincode, phone } = req.body;
 
     try {
         // Find user by ID (using the ID from the JWT token)
@@ -151,6 +151,7 @@ exports.updateProfile = async (req, res) => {
         user.country = country || user.country;
         user.city = city || user.city;
         user.pincode = pincode || user.pincode;
+        user.phone = phone || user.phone;
 
         // Save the updated user data
         await user.save();
