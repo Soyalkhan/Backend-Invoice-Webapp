@@ -131,6 +131,7 @@ exports.login = async (req, res) => {
 //update users profile with all deatils
 
 exports.updateProfile = async (req, res) => {
+
     const { first_name, last_name, companyName, GST, profileImage, companyFullAddress, country, city, pincode, phone } = req.body;
 
     try {
@@ -163,5 +164,36 @@ exports.updateProfile = async (req, res) => {
         });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+
+exports.FetchUserProfile = async (req, res) => {
+    try {
+        // Ensure user exists in the request (from the `protect` middleware)
+        if (!req.user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Return user profile details
+        res.status(200).json({
+            success: true,
+            user: {
+                id: req.user._id,
+                email: req.user.email,
+                first_name: req.user.first_name,
+                last_name: req.user.last_name,
+                companyName: req.user.companyName,
+                GST: req.user.GST,
+                profileImage: req.user.profileImage,
+                companyFullAddress: req.user.companyFullAddress,
+                country: req.user.country,
+                city: req.user.city,
+                pincode: req.user.pincode,
+                phone: req.user.phone,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };
