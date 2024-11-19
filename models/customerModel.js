@@ -14,7 +14,7 @@ const CustomerSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     companyName: { type: String, default: '' },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true},
     phone: { type: String, required: true },
     gstNumber: { type: String, default: '' },
     billingAddress: { type: AddressSchema, required: true },
