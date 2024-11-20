@@ -5,8 +5,8 @@ const { protect } = require('../middlewares/middleware');
 const router = express.Router();
 
 router.post('/generateInvoice', protect, createInvoice);
-router.post('/updateInvoice', protect, updateInvoice);
-router.post('/deleteProduct', protect, deleteInvoice )
+router.put('/updateInvoice/:invoiceId', protect, updateInvoice);
+router.delete('/deleteInvoice/:invoiceId', protect, deleteInvoice);
 router.get('/fetchAllInvoice', protect, getInvoices);
 router.get('/SearchInvoice', protect, getInvoiceBySearch);
 

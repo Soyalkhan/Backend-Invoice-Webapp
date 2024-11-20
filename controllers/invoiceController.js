@@ -1,17 +1,12 @@
-const Invoice = require('../models/invoiceModel')
+const Invoice = require('../models/invoiceModel');
 
 exports.createInvoice = async (req, res) => {
     const { 
         brandLogoUrl, invoiceNumber, invoiceDate, invoiceDueDate, companyName, 
-        location, billTo, shipTo, productDetails, payment 
+        location, billTo, shipTo, products, payment 
     } = req.body;
 
     try {
-        // Calculate subtotal, tax, and balance due from product details
-        const subtotal = productDetails.reduce((sum, product) => sum + (product.quantity * product.rate), 0);
-        const tax = productDetails.reduce((sum, product) => sum + product.tax, 0);
-        const balanceDue = subtotal - payment.discount + tax - payment.paymentMade;
-
         const invoice = new Invoice({
             userId: req.user._id,
             brandLogoUrl,
@@ -22,8 +17,8 @@ exports.createInvoice = async (req, res) => {
             location,
             billTo,
             shipTo,
-            productDetails,
-            payment: { ...payment, subtotal, tax, balanceDue },
+            products,
+            payment,  // Payment is passed directly without calculation
         });
 
         await invoice.save();
@@ -33,8 +28,6 @@ exports.createInvoice = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
-
 
 exports.updateInvoice = async (req, res) => {
     const { invoiceId } = req.params;
@@ -52,13 +45,6 @@ exports.updateInvoice = async (req, res) => {
             invoice[key] = updates[key];
         });
 
-        // Recalculate balance due
-        const subtotal = invoice.productDetails.reduce((sum, product) => sum + (product.quantity * product.rate), 0);
-        const tax = invoice.productDetails.reduce((sum, product) => sum + product.tax, 0);
-        invoice.payment.subtotal = subtotal;
-        invoice.payment.tax = tax;
-        invoice.payment.balanceDue = subtotal - invoice.payment.discount + tax - invoice.payment.paymentMade;
-
         await invoice.save();
 
         res.status(200).json({ success: true, message: 'Invoice updated successfully', invoice });
@@ -66,7 +52,6 @@ exports.updateInvoice = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
 
 exports.deleteInvoice = async (req, res) => {
     const { invoiceId } = req.params;
@@ -83,39 +68,56 @@ exports.deleteInvoice = async (req, res) => {
     }
 };
 
-
+// Fetch all invoices for the authenticated user
 exports.getInvoices = async (req, res) => {
     try {
         const invoices = await Invoice.find({ userId: req.user._id });
+        
         res.status(200).json({ success: true, invoices });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-
+// Search invoices based on various fields
 exports.getInvoiceBySearch = async (req, res) => {
     const { search } = req.query;
 
+    if (!search) {
+        return res.status(400).json({ 
+            success: false, 
+            message: "Search term is required." 
+        });
+    }
+
     try {
-        // Perform a case-insensitive search on the specified fields
-        const invoice = await Invoice.findOne({
-            userId: req.user._id, // Ensure it belongs to the authenticated user
+        const invoices = await Invoice.find({
+            userId: req.user._id,
             $or: [
-                { 'billTo.customerName': { $regex: search, $options: 'i' } }, // Customer Name
-                { companyName: { $regex: search, $options: 'i' } }, // Company Name
-                { 'billTo.mobileNumber': { $regex: search, $options: 'i' } }, // Mobile Number
-                { invoiceNumber: { $regex: search, $options: 'i' } }, // Invoice Number
-                { 'billTo.gstNumber': { $regex: search, $options: 'i' } }, // GST Number
+                { 'billTo.customerName': { $regex: search, $options: 'i' } },
+                { companyName: { $regex: search, $options: 'i' } },
+                { 'billTo.mobileNumber': { $regex: search, $options: 'i' } },
+                { invoiceNumber: { $regex: search, $options: 'i' } },
+                { 'billTo.gstNumber': { $regex: search, $options: 'i' } },
             ],
         });
 
-        if (!invoice) {
-            return res.status(404).json({ success: false, message: 'No invoice found matching the search criteria' });
+        if (invoices.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No invoices found matching the search criteria.',
+            });
         }
 
-        res.status(200).json({ success: true, invoice });
+        res.status(200).json({
+            success: true,
+            invoices,
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: "An error occurred while searching for invoices.", 
+            error: error.message 
+        });
     }
 };

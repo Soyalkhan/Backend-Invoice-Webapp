@@ -14,7 +14,7 @@ const InvoiceSchema = new mongoose.Schema({
     brandLogoUrl: { type: String, required: true },
     invoiceNumber: { type: String, required: true },
     invoiceDate: { type: Date, required: true },
-    dueDate: { type: Date, required: true },
+    invoiceDueDate: { type: Date, required: true },
     companyName: { type: String, required: true },
     poNumber: { type: String, default: '' },
     location: {
