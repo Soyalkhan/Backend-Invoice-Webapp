@@ -15,6 +15,26 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    invoice_Number: {
+        type: String,
+        default: '1001'
+    },
+    invoice_Prefix: {
+        type: String,
+        default: ''
+    },
+    total_invoice_paid_amount: {
+        type: String,
+        default: '0'
+    },
+    total_invoice_balance: {
+        type: String,
+        default: '0'
+    },
+    total_invoice_amount: {
+        type: String,
+        default: '0'
+    },
     phone: {
         type: String,
         default: ''
