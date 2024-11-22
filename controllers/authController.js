@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
+
 dotenv.config({ path: "./.env" });
 
 const transporter = nodemailer.createTransport({
@@ -61,10 +62,11 @@ exports.registerUser = async (req, res) => {
       "User registered successfully, Please verify your email from your inbox."
     );
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    return res.status(400).json({ success: false, error: error.message });
   }
 };
 
+//email send verification check
 exports.verifyEmail = async (req, res) => {
   const { token } = req.query;
 
@@ -81,7 +83,8 @@ exports.verifyEmail = async (req, res) => {
     await user.save();
 
     res.send("Email verified successfully!");
-    res
+    
+    return res
       .status(200)
       .json({ success: true, message: "Email verified successfully!" });
   } catch (error) {
@@ -89,6 +92,43 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+exports.checkEmailVerfication = async (req, res) =>{
+  const { token} = req.query;
+
+  try {
+
+    const user = await User.findOne({verificationToken: token});
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+
+    // Check the isVerified status of the user
+    if(user.isVerified){
+      return res
+      .status(200)
+      .json({ 
+      success: true,
+      isVerified: true, 
+      message: "Email is verfied successfully!" });
+    }else{
+      return res.status(200).json({
+        success: true,
+        isVerified: false,
+        message: "Email not verified yet!"
+      });
+    }
+    
+  } catch (error) {
+    console.error("Error checking email verification:", error);
+    return res.status(500).json({
+      success: false,
+      isVerified: false,
+      message: "An error occurred while verifying the email.",
+    });
+}
+}
 // Generate JWT for user authentication and send in reponse
 const sendTokenResponse = (user, statusCode, res, message) => {
   const token = user.getSignedJwtToken();
@@ -155,11 +195,13 @@ exports.updateProfile = async (req, res) => {
     first_name,
     last_name,
     companyName,
+    brandColor,
     GST,
-    profileImage,
+    brandLogoUrl,
     companyFullAddress,
     country,
     city,
+    state,
     pincode,
     phone,
     invoice_Number,
@@ -184,7 +226,7 @@ exports.updateProfile = async (req, res) => {
     user.last_name = last_name || user.last_name;
     user.companyName = companyName || user.companyName;
     user.GST = GST || user.GST;
-    user.profileImage = profileImage || user.profileImage;
+    user.brandLogoUrl = brandLogoUrl || user.brandLogoUrl;
     user.companyFullAddress = companyFullAddress || user.companyFullAddress;
     user.country = country || user.country;
     user.city = city || user.city;
@@ -195,17 +237,19 @@ exports.updateProfile = async (req, res) => {
     user.total_invoice_amount = total_invoice_amount || user.total_invoice_amount;
     user.total_invoice_balance = total_invoice_balance || user.total_invoice_balance;
     user.total_invoice_paid_amount = total_invoice_paid_amount || user.total_invoice_paid_amount;
-
+    user.state = state || user.state;
+    user.brandColor = brandColor || user.brandColor;
+    
     // Save the updated user data
     await user.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
       user,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    return res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -228,7 +272,7 @@ exports.FetchUserProfile = async (req, res) => {
         last_name: req.user.last_name,
         companyName: req.user.companyName,
         GST: req.user.GST,
-        profileImage: req.user.profileImage,
+        brandLogoUrl: req.user.brandLogoUrl,
         companyFullAddress: req.user.companyFullAddress,
         country: req.user.country,
         city: req.user.city,
@@ -239,7 +283,9 @@ exports.FetchUserProfile = async (req, res) => {
         total_invoice_amount: req.user.total_invoice_amount,
         total_invoice_balance: req.user.total_invoice_balance,
         total_invoice_pending: req.user.total_invoice_paid_amount,
-        socialUrls: req.user.socialUrls
+        socialUrls: req.user.socialUrls,
+        state: req.user.state,
+        brandColor: req.user.brandColor
       },
     });
   } catch (error) {

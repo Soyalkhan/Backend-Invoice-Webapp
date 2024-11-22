@@ -8,6 +8,6 @@ router.post('/generateInvoice', protect, createInvoice);
 router.put('/updateInvoice/:invoiceId', protect, updateInvoice);
 router.delete('/deleteInvoice/:invoiceId', protect, deleteInvoice);
 router.get('/fetchAllInvoice', protect, getInvoices);
-router.get('/SearchInvoice', protect, getInvoiceBySearch);
+router.get('/search', protect, getInvoiceBySearch);
 
 module.exports = router;

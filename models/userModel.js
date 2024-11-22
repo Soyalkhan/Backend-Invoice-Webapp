@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    brandColor: {
+        type: String,
+        default: ''
+    },
     invoice_Number: {
         type: String,
         default: '1001'
@@ -39,7 +43,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    profileImage: {
+    brandLogoUrl: {
         type: String,
         default: '' // URL of the profile image
     },
@@ -66,6 +70,10 @@ const UserSchema = new mongoose.Schema({
         default: ''
     },
     country: {
+        type: String,
+        default: ''
+    },
+    state: {
         type: String,
         default: ''
     },
