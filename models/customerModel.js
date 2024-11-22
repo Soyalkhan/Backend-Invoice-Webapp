@@ -5,8 +5,8 @@ const AddressSchema = new mongoose.Schema({
     address1: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    pincode: { type: String, required: true },
-    phone: { type: String, required: true },
+    pincode: { type: String, required: true }
+    
 });
 
 const CustomerSchema = new mongoose.Schema({
