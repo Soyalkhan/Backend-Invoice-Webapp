@@ -3,7 +3,7 @@ const Invoice = require('../models/invoiceModel');
 exports.createInvoice = async (req, res) => {
     const { 
         brandLogoUrl, invoiceNumber, invoiceDate, invoiceDueDate, companyName, 
-        location, billTo, shipTo, products, payment 
+        location, billTo, shipTo, products, payment, customerInvoiceNote, termsAndCondition,   
     } = req.body;
 
     try {
@@ -18,7 +18,9 @@ exports.createInvoice = async (req, res) => {
             billTo,
             shipTo,
             products,
-            payment,  // Payment is passed directly without calculation
+            payment,
+            customerInvoiceNote,
+            termsAndCondition  
         });
 
         await invoice.save();
@@ -52,6 +54,7 @@ exports.updateInvoice = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 exports.deleteInvoice = async (req, res) => {
     const { invoiceId } = req.params;

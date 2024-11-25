@@ -41,7 +41,8 @@ const InvoiceSchema = new mongoose.Schema({
         },
     ],
     payment: {
-        subtotal: { type: Number, required: true },
+        modeOfPayment: { type: String, default: '' },
+        total: { type: Number, required: true },
         discount: { type: Number, default: 0 },
         tax: { type: Number, required: true },
         paymentMade: { type: Number, default: 0 },
@@ -51,6 +52,14 @@ const InvoiceSchema = new mongoose.Schema({
         type: String, 
         enum: ['paid', 'unpaid', 'partially paid'], 
         default: 'unpaid' 
+    },
+    customerInvoiceNote: { 
+        type: String, 
+        default: 'Thanks for business with us!' 
+    },
+    termsAndCondition: { 
+        type: String, 
+        default: 'Make sure to clear raised invoice under 30 days! '
     },
 }, { timestamps: true });
 
