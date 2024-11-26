@@ -1,12 +1,26 @@
 const mongoose = require("mongoose");
 
 const ProductDetailsSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  hsnOrSac: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  rate: { type: Number, required: true },
-  tax: { type: Number, required: true }, // Tax in percentage
-  amount: { type: Number, required: true }, // Calculated (rate * quantity + tax)
+    name: { type: String, required: true },
+    hsnCode: { type: String, required: true },
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+    tax: {
+        cgst: {
+            type: String,
+            default: ''
+        },
+        sgst: {
+            type: String,
+            default: ''
+        },
+        igst: {
+            type: String,
+            default: ''
+        }
+    },
+    subTotalAmount: { type: Number, required: true }
+
 });
 
 const InvoiceSchema = new mongoose.Schema({
