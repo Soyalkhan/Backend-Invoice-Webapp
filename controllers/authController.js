@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
-
+const Statement = require("../models/statementModel.js")
 dotenv.config({ path: "./.env" });
 
 const transporter = nodemailer.createTransport({
@@ -44,22 +44,34 @@ exports.registerUser = async (req, res) => {
     // Save the user instance
     await newUser.save();
 
+     // Initialize the statement with an opening balance
+     const statement = new Statement({
+      userId: newUser._id,
+      transactionType: "***Opening Balance***",
+      details: " Account initialized with an opening balance of 0.",
+      amount: 0,
+      paymentReceived: 0,
+      balance: 0,
+    });
+
+    await statement.save();
+
     // Send a verification email
-    const verificationLink = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
-    const mailOptions = {
-      from: "noreply@raseed.io",
-      to: email,
-      subject: "Email Verification FROM RASEED.IO",
-      text: `Please verify your email by clicking the following link: ${verificationLink}`,
-    };
-    await transporter.sendMail(mailOptions);
+    // const verificationLink = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
+    // const mailOptions = {
+    //   from: "noreply@raseed.io",
+    //   to: email,
+    //   subject: "Email Verification FROM RASEED.IO",
+    //   text: `Please verify your email by clicking the following link: ${verificationLink}`,
+    // };
+    // await transporter.sendMail(mailOptions);
 
     // Use the newUser instance to get the token
     sendTokenResponse(
       newUser,
       201,
       res,
-      "User registered successfully, Please verify your email from your inbox."
+      "User registered successfully, Please verify your email from your inbox. Statment balance created with 0"
     );
   } catch (error) {
     return res.status(400).json({ success: false, error: error.message });
@@ -255,7 +267,8 @@ exports.updateProfile = async (req, res) => {
 
 exports.FetchUserProfile = async (req, res) => {
   try {
-    // Ensure user exists in the request (from the `protect` middleware)
+
+    
     if (!req.user) {
       return res
         .status(404)
@@ -290,5 +303,45 @@ exports.FetchUserProfile = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+//update only payment fileds 
+exports.updatePaymentFields = async (req, res) => {
+  const {
+    invoice_Number,
+    total_invoice_amount,
+    total_invoice_balance,
+    total_invoice_paid_amount
+  } = req.body;
+
+  try {
+    // Find user by ID (using the ID from the JWT token)
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // update only user main amount 
+   
+    user.invoice_Number = invoice_Number || user.invoice_Number;
+    user.total_invoice_amount = total_invoice_amount || user.total_invoice_amount;
+    user.total_invoice_balance = total_invoice_balance || user.total_invoice_balance;
+    user.total_invoice_paid_amount = total_invoice_paid_amount || user.total_invoice_paid_amount;
+    
+    // Save the updated user data
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Main amount and invoice number updated",
+      user,
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
   }
 };
