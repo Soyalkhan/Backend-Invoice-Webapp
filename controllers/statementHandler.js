@@ -106,3 +106,24 @@ exports.addPaymentToStatement = async (req, res) => {
     res.status(500).json({ success: false, message: "Error adding payment to statement." });
   }
 };
+
+
+
+
+// Fetch all transactions for a user
+exports.getUserStatements = async (req, res) => {
+  const { userId } = req.params; // Assuming userId is passed as a route parameter
+
+  try {
+    // Fetch all statements for the user, sorted by date (most recent first)
+    const statements = await Statement.find({ userId }).sort({ date: -1 });
+
+    res.status(200).json({
+      success: true,
+      statements,
+    });
+  } catch (error) {
+    console.error("Error fetching user statements:", error);
+    res.status(500).json({ success: false, message: "Error fetching user statements." });
+  }
+};
