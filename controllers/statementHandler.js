@@ -110,13 +110,15 @@ exports.addPaymentToStatement = async (req, res) => {
 
 
 
-// Fetch all transactions for a user
 exports.getUserStatements = async (req, res) => {
-  const { userId } = req.params; // Assuming userId is passed as a route parameter
-
   try {
+    // Extract userId from the `req.user` set by the protect middleware
+    const userId = req.user.id;
+
     // Fetch all statements for the user, sorted by date (most recent first)
     const statements = await Statement.find({ userId }).sort({ date: -1 });
+
+    console.log(`userID: ${userId}, statements: ${statements}`);
 
     res.status(200).json({
       success: true,
