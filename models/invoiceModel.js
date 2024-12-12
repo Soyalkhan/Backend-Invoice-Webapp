@@ -25,6 +25,7 @@ const ProductDetailsSchema = new mongoose.Schema({
 
 const InvoiceSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
     brandLogoUrl: { type: String },
     invoiceNumber: { type: String, required: true },
     invoiceDate: { type: Date, required: true },

@@ -1,6 +1,7 @@
 const Invoice = require("../models/invoiceModel");
 const Statement = require("../models/statementModel");
-
+const Customer = require('../models/customerModel')
+const CustomerStatement = require('../models/customerStatementModel')
 // exports.createInvoice = async (req, res) => {
 //     const {
 //         brandLogoUrl, invoiceNumber, invoiceDate, invoiceDueDate, companyName,
@@ -111,12 +112,22 @@ exports.createInvoice = async (req, res) => {
     country,
     pincode,
     paymentStatus,
+    customerId, // Newly added
   } = req.body;
 
   try {
-    // Step 1: Create the invoice
+    // Step 1: Validate if the customer exists
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found." });
+    }
+
+    // Step 2: Create the invoice
     const invoice = new Invoice({
       userId: req.user._id,
+      customerId, // Link to the customer
       brandLogoUrl,
       invoiceNumber,
       invoiceDate,
@@ -141,49 +152,81 @@ exports.createInvoice = async (req, res) => {
     // Save the invoice
     await invoice.save();
 
-    // Step 2: Get the last balance for the logged-in user
-    const lastEntry = await Statement.findOne({ userId: req.user._id }).sort({
-      date: -1,
-    });
-    const previousBalance = lastEntry ? lastEntry.balance : 0;
+    // Step 3: Get the last balance for the user and the customer
+    const lastUserStatement = await Statement.findOne({ userId: req.user._id }).sort({ date: -1 });
+    const previousUserBalance = lastUserStatement ? lastUserStatement.balance : 0;
 
-    // Step 3: Create a statement entry for the invoice
+    const lastCustomerStatement = await CustomerStatement.findOne({
+      customerId,
+    }).sort({ date: -1 });
+    const previousCustomerBalance = lastCustomerStatement
+      ? lastCustomerStatement.balance
+      : 0;
+
     // Extract payment details
     const invoiceAmount = payment.grandTotal || 0; // Total invoice amount
     const balanceDue = payment.balanceDue || 0; // Unpaid amount
     const paymentReceived = invoiceAmount - balanceDue; // Payment received
 
-    // Add an invoice entry to the statement
-    const invoiceStatement = new Statement({
+    // Step 4: Add an entry to the user's statement
+    const userStatement = new Statement({
       userId: req.user._id,
       transactionType: "Invoice",
       details: `Invoice: ${invoiceNumber}, ${companyName}, ${billTo.customerName}`,
       amount: invoiceAmount,
       paymentReceived: 0,
-      balance: previousBalance + invoiceAmount,
+      balance: previousUserBalance + invoiceAmount,
     });
 
-    await invoiceStatement.save();
+    await userStatement.save();
 
-    // Add a payment entry if payment was received at creation
+    // Step 5: Add an entry to the customer's statement
+    const customerStatement = new CustomerStatement({
+      userId: req.user._id,
+      customerId,
+      invoiceId: invoice._id,
+      transactionType: "Invoice",
+      details: `Invoice: ${invoiceNumber}, ${companyName}`,
+      amount: invoiceAmount,
+      paymentReceived: 0,
+      balance: previousCustomerBalance + invoiceAmount,
+    });
+
+
+    await customerStatement.save();
+
+    // Step 6: Add a payment entry if payment was received at creation
     if (paymentReceived > 0) {
-      const paymentStatement = new Statement({
+      const userPaymentStatement = new Statement({
         userId: req.user._id,
         transactionType: "Payment Received",
         details: `Payment received for Invoice: ${invoiceNumber}.`,
         amount: 0,
         paymentReceived,
-        balance: previousBalance + invoiceAmount - paymentReceived,
+        balance: previousUserBalance + invoiceAmount - paymentReceived,
       });
 
-      await paymentStatement.save();
+      await userPaymentStatement.save();
+
+      const customerPaymentStatement = new CustomerStatement({
+        userId: req.user._id,
+        customerId,
+        invoiceId: invoice._id,
+        transactionType: "Payment Received",
+        details: `Payment received for Invoice: ${invoiceNumber}.`,
+        amount: 0,
+        paymentReceived,
+        balance: previousCustomerBalance + invoiceAmount - paymentReceived,
+      });
+
+      await customerPaymentStatement.save();
     }
 
-    // Step 5: Respond to the client
+    // Step 7: Respond to the client
     res.status(201).json({
       success: true,
       message:
-        "Invoice created successfully, payment status updated in the statement.",
+        "Invoice created successfully, user and customer statements updated.",
       invoice,
     });
   } catch (error) {
@@ -191,6 +234,7 @@ exports.createInvoice = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 exports.updateInvoice = async (req, res) => {
   const { invoiceId } = req.params;
