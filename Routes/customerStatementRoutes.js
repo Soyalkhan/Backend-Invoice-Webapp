@@ -1,12 +1,13 @@
 const express = require("express");
-const router = express.Router();
 const {
   initializeCustomerStatement,
   addInvoiceToCustomerStatement,
   addPaymentToCustomerStatement,
   getCustomerStatements,
 } = require("../controllers/customerStatementController");
-const protect = require("../middlewares/middleware");
+const { protect } = require("../middlewares/middleware");
+
+const router = express.Router();
 
 // Initialize customer statement
 router.post("/initializeCustomerStatement", protect, initializeCustomerStatement);
@@ -18,6 +19,6 @@ router.post("/add-invoiceToCustomerStatement", protect, addInvoiceToCustomerStat
 router.post("/add-payment-paymentToCustomerStatement", protect, addPaymentToCustomerStatement);
 
 // Fetch customer statements
-router.get("/getCustomerStatements", protect, getCustomerStatements);
+router.get("/get-particular-Customer-Statements", protect, getCustomerStatements);
 
 module.exports = router;

@@ -112,7 +112,7 @@ exports.createInvoice = async (req, res) => {
     country,
     pincode,
     paymentStatus,
-    customerId, // Newly added
+    customerId, // to maping with customer
   } = req.body;
 
   try {
