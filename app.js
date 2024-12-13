@@ -28,5 +28,5 @@ app.use('/api/products' , require('./Routes/productRoutes'));// products routes
 app.use('/api/invoice',require('./Routes/invoiceRoutes') )// invoice routes 
 app.use('/api/statement',require('./Routes/statementRoutes') )// Statement routes 
 app.use('/api/customerStatement',require('./Routes/customerStatementRoutes') )// customer Statement routes 
-
+app.use('/api/brand-logo', require('./Routes/brandLogoRoutes')); // logo manage
 module.exports = app;
