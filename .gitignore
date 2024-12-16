@@ -1,3 +1,56 @@
-# .gitignore
-.env
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
 node_modules/
+jspm_packages/
+
+# Build output
+dist/
+build/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.*.local
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+
+# Package locks
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional: Ignore local development configuration files
+*.local
+
+# Optional: Ignore tests output
+test-results/
+
+# Optional: Ignore Firebase/Google cloud generated files
+.firebase/
