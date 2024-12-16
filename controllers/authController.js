@@ -295,7 +295,7 @@ exports.FetchUserProfile = async (req, res) => {
         invoice_Prefix: req.user.invoice_Prefix,
         total_invoice_amount: req.user.total_invoice_amount,
         total_invoice_balance: req.user.total_invoice_balance,
-        total_invoice_pending: req.user.total_invoice_paid_amount,
+        total_invoice_paid_amount: req.user.total_invoice_paid_amount,
         socialUrls: req.user.socialUrls,
         state: req.user.state,
         brandColor: req.user.brandColor
