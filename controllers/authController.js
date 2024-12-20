@@ -298,7 +298,8 @@ exports.FetchUserProfile = async (req, res) => {
         total_invoice_paid_amount: req.user.total_invoice_paid_amount,
         socialUrls: req.user.socialUrls,
         state: req.user.state,
-        brandColor: req.user.brandColor
+        brandColor: req.user.brandColor,
+        selectedInvoiceTemplate: req.user.selectedInvoiceTemplate,
       },
     });
   } catch (error) {
@@ -343,5 +344,49 @@ exports.updatePaymentFields = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+
+// to update invoice teplate 
+
+exports.UpdateSelectedTemplate = async (req, res) => {
+  try {
+    const { selectedInvoiceTemplate } = req.body; // Get the template from the request body
+
+    if (!req.user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (!selectedInvoiceTemplate) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Selected template is required" });
+    }
+
+    // Update the selectedInvoiceTemplate in the database
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id, // Find the user by their ID
+      { selectedInvoiceTemplate }, // Update only the selectedInvoiceTemplate field
+      { new: true } // Return the updated user document
+    );
+
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found or update failed" });
+    }
+
+    // Respond with success
+    res.status(200).json({
+      success: true,
+      message: "Selected invoice template updated successfully",
+      user: {
+        id: updatedUser._id,
+        selectedInvoiceTemplate: updatedUser.selectedInvoiceTemplate,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
