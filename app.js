@@ -29,4 +29,5 @@ app.use('/api/invoice',require('./Routes/invoiceRoutes') )// invoice routes
 app.use('/api/statement',require('./Routes/statementRoutes') )// Statement routes 
 app.use('/api/customerStatement',require('./Routes/customerStatementRoutes') )// customer Statement routes 
 app.use('/api/brand-logo', require('./Routes/brandLogoRoutes')); // logo manage
+app.use('/api/vendor', require('./Routes/vendorRoutes')); // vendor routes
 module.exports = app;

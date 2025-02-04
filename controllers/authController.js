@@ -190,6 +190,7 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.log(err);
 
+  
     res
       .status(400)
       .json({
