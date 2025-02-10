@@ -209,7 +209,7 @@ exports.createInvoice = async (req, res) => {
       await userPaymentStatement.save();
 
       const customerPaymentStatement = new CustomerStatement({
-        userId: req.user._id,
+        userId: req.user._id, 
         customerId,
         invoiceId: invoice._id,
         transactionType: "Payment Received",

@@ -5,7 +5,7 @@ const StatementSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   transactionType: {
     type: String,
-    enum: ["Invoice", "Payment Received", "***Opening Balance***"],
+    enum: ["Bill","Invoice", "Payment Received", "Payment Made", "***Opening Balance***"],
     required: true,
   },
   details: { type: String, required: true }, // Invoice number, person name, or company name
