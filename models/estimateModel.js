@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require("mongoose");
 
 const estimateSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -85,6 +85,4 @@ const estimateSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
-const Estimate = mongoose.model('Estimate', estimateSchema);
-
-export default Estimate;
+module.exports = mongoose.model('Estimate', estimateSchema);

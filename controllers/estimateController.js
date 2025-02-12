@@ -1,6 +1,6 @@
-import Estimate from "../models/estimateModel.js";
+const  Estimate = require("../models/estimateModel");
 
-export const createEstimate = async (req, res) => {
+exports.createEstimate = async (req, res) => {
   try {
     const {
       userId,
@@ -27,7 +27,7 @@ export const createEstimate = async (req, res) => {
     } = req.body;
 
     const estimate = new Estimate({
-      userId,
+      userId : req.user._id,
       customerId,
       brandLogoUrl,
       estimateNumber,
@@ -57,7 +57,7 @@ export const createEstimate = async (req, res) => {
   }
 };
 
-export const getEstimates = async (req, res) => {
+exports.getEstimates = async (req, res) => {
   try {
     const estimates = await Estimate.find().populate("userId customerId");
     res.json({ success: true, message: "Fetched all estimates successfully", data: estimates });
@@ -66,7 +66,7 @@ export const getEstimates = async (req, res) => {
   }
 };
 
-export const getEstimateById = async (req, res) => {
+exports.getEstimateById = async (req, res) => {
   try {
     const estimate = await Estimate.findById(req.params.id).populate("userId customerId");
     if (!estimate) {
@@ -78,7 +78,7 @@ export const getEstimateById = async (req, res) => {
   }
 };
 
-export const updateEstimate = async (req, res) => {
+exports.updateEstimate = async (req, res) => {
   try {
     const estimate = await Estimate.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).populate("userId customerId");
     if (!estimate) {
@@ -90,7 +90,7 @@ export const updateEstimate = async (req, res) => {
   }
 };
 
-export const deleteEstimate = async (req, res) => {
+exports.deleteEstimate = async (req, res) => {
   try {
     const estimate = await Estimate.findByIdAndDelete(req.params.id);
     if (!estimate) {
